@@ -1,0 +1,14 @@
+%syntax-version=1.0.0
+%project=dem
+
+create_roles 2022-09-11T05:14:42Z Mike Vesprini <mike@button.is> # Create roles used by the application
+schemas/main 2022-09-11T05:20:21Z Mike Vesprini <mike@button.is> # Create the dem schema
+schemas/private 2022-09-11T05:21:41Z Mike Vesprini <mike@button.is> # Create dem_private schema
+util_functions/verify_function_not_present 2022-09-11T05:23:09Z Mike Vesprini <mike@button.is> # Create the dem_private.verify_function_not_present function
+util_functions/verify_grant 2022-09-11T05:24:21Z Mike Vesprini <mike@button.is> # Create the dem_private.verify_grant function
+util_functions/verify_policy 2022-09-11T05:25:43Z Mike Vesprini <mike@button.is> # Create the dem_private.verify_policy function
+util_functions/verify_policy_not_present 2022-09-11T05:26:22Z Mike Vesprini <mike@button.is> # Create the dem_private.verify_policy_not_present function
+util_functions/verify_type_not_present 2022-09-11T05:26:54Z Mike Vesprini <mike@button.is> # Create the dem_private.verify_type_not_present function
+util_functions/grant_permissions 2022-09-11T05:29:22Z Mike Vesprini <mike@button.is> # Create the dem_private.grant_permissions function
+util_functions/read_only_user_policies 2022-09-11T05:30:38Z Mike Vesprini <mike@button.is> # Create the dem_private.read_only_user_policies function
+util_functions/upsert_policy 2022-09-11T05:31:21Z Mike Vesprini <mike@button.is> # Create the dem_private.upsert_policy function

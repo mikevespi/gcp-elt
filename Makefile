@@ -15,7 +15,7 @@ CPANM=PERL_CPANM_HOME=$(__DIRNAME)/.cpanm cpanm --notest
 SQITCH=sqitch
 SQITCH_VERSION=${word 3,${shell ${SQITCH} --version}}
 SQITCH_MIN_VERSION=1.1.0
-DB_NAME=eltd
+DB_NAME=dem
 PG_PROVE=pg_prove -h localhost
 PGTAP_VERSION=1.2.0
 
@@ -199,4 +199,4 @@ db_unit_tests:
 db_style_tests: ## run the database style tests
 db_style_tests: | start_pg deploy_test_db_migrations
 db_style_tests:
-	@$(PG_PROVE) --failures -d $(DB_NAME)_test schema/test/style/*_test.sql --set schemas_to_test=eltd,eltd_private
+	@$(PG_PROVE) --failures -d $(DB_NAME)_test schema/test/style/*_test.sql --set schemas_to_test=dem,dem_private
