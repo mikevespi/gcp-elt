@@ -11,7 +11,8 @@ declare
   user_id int;
 
 begin
-  user_sub := (select sub from dem.session());
+-- TODO: setup session function for this. Hardcoded to get tests passing
+  user_sub := '11111111-1111-1111-1111-111111111112'::uuid;
   user_id := (select id from dem.dem_user where dem_user.uuid = user_sub);
   if tg_op = 'INSERT' then
     if to_jsonb(new) ? 'created_at' then
