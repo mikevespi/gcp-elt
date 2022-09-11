@@ -1,0 +1,14 @@
+%syntax-version=1.0.0
+%project=dem
+
+create_roles 2022-09-11T05:14:42Z Mike Vesprini <mike@button.is> # Create roles used by the application
+schemas/main 2022-09-11T05:20:21Z Mike Vesprini <mike@button.is> # Create the dem schema
+schemas/private 2022-09-11T05:21:41Z Mike Vesprini <mike@button.is> # Create dem_private schema
+util_functions/verify_policy 2022-09-11T05:25:43Z Mike Vesprini <mike@button.is> # Create the dem_private.verify_policy function
+util_functions/grant_permissions 2022-09-11T05:29:22Z Mike Vesprini <mike@button.is> # Create the dem_private.grant_permissions function
+util_functions/read_only_user_policies 2022-09-11T05:30:38Z Mike Vesprini <mike@button.is> # Create the dem_private.read_only_user_policies function
+util_functions/upsert_policy 2022-09-11T05:31:21Z Mike Vesprini <mike@button.is> # Create the dem_private.upsert_policy function
+trigger_functions/update_timestamps 2022-09-11T17:31:57Z Mike Vesprini <mike@button.is> # Create the dem_private.update_timestamps trigger function
+trigger_functions/archived_records_are_immutable 2022-09-11T17:34:03Z Mike Vesprini <mike@button.is> # A trigger to ensure that no changes to a deleted record can be save
+util_functions/upsert_timestamp_columns [schemas/private trigger_functions/update_timestamps] 2022-09-11T17:35:34Z Mike Vesprini <mike@button.is> # Create the upsert_timestamp_columns function
+tables/dem_user 2022-09-11T17:46:27Z Mike Vesprini <mike@button.is> # Create the dem.dem_user table
