@@ -106,23 +106,6 @@ create_test_db:
 		$(PSQL) -d postgres -c "CREATE DATABASE $(DB_NAME)_test" &&\
 		$(PSQL) -d $(DB_NAME)_test -c "create extension if not exists pgtap";
 
-.PHONY: drop_foreign_test_db
-drop_foreign_test_db: ## Drop the $(DB_NAME) database if it exists
-drop_foreign_test_db:
-	@$(PSQL) -d postgres -tc "SELECT count(*) FROM pg_database WHERE datname = 'foreign_test_db'" | \
-		grep -q 0 || \
-		$(PSQL) -d postgres -c "DROP DATABASE foreign_test_db" && \
-		$(PSQL) -d postgres -c "DROP USER IF EXISTS foreign_user";
-
-.PHONY: create_foreign_test_db
-create_foreign_test_db: ## Ensure that the $(DB_NAME)_test database exists
-create_foreign_test_db:
-	@$(PSQL) -d postgres -tc "SELECT count(*) FROM pg_database WHERE datname = 'foreign_test_db'" | \
-		grep -q 1 || \
-		$(PSQL) -d postgres -c "CREATE DATABASE foreign_test_db" &&\
-		$(PSQL) -d foreign_test_db -f "./schema/data/test_setup/external_database_setup.sql" &&\
-		$(PSQL) -d $(DB_NAME)_test -c "create extension if not exists postgres_fdw";
-
 .PHONY: drop_test_db
 drop_test_db: ## Drop the $(DB_NAME)_test database if it exists
 drop_test_db:
@@ -134,69 +117,41 @@ drop_test_db:
 deploy_db_migrations: ## deploy the database migrations with sqitch
 deploy_db_migrations: start_pg create_db
 deploy_db_migrations:
-	@$(SQITCH) --chdir schema deploy
-	@$(SQITCH) --chdir mocks_schema deploy
+	@$(SQITCH) --chdir db deploy
 
 deploy_dev_data: ## deploy the database migrations with sqitch and load the data for local development
 deploy_dev_data: deploy_db_migrations
 deploy_dev_data:
-	@for file in $(__DIRNAME)/schema/data/dev/*; do \
+	@for file in $(__DIRNAME)/db/data/dev/*; do \
 		$(PSQL) -d $(DB_NAME) -f "$${file}"; \
 	done;
-
-deploy_prod_data: ## deploy the database migrations with sqitch and load the production data
-deploy_prod_data: deploy_db_migrations
-deploy_prod_data:
-	@for file in $(__DIRNAME)/schema/data/prod/*; do \
-		$(PSQL) -d $(DB_NAME) -f "$${file}"; \
-	done;
-
 
 .PHONY: revert_db_migrations
 revert_db_migrations: ## revert the database migrations with sqitch
 revert_db_migrations: start_pg
 revert_db_migrations:
-	@$(SQITCH) --chdir schema revert
-	@$(SQITCH) --chdir mocks_schema revert
-
-
-.PHONY: verify_db_migrations
-verify_db_migrations: ## verify the database migrations with sqitch
-verify_db_migrations: start_pg
-verify_db_migrations:
-	@$(SQITCH) --chdir schema verify
-	@$(SQITCH) --chdir mocks_schema verify
+	@$(SQITCH) --chdir db revert
 
 .PHONY: deploy_test_db_migrations
 deploy_test_db_migrations: ## deploy the test database migrations with sqitch
 deploy_test_db_migrations: start_pg create_test_db
 deploy_test_db_migrations:
-	@SQITCH_TARGET="db:pg:" PGHOST=localhost PGDATABASE=$(DB_NAME)_test $(SQITCH) --chdir schema deploy
-	@SQITCH_TARGET="db:pg:" PGHOST=localhost PGDATABASE=$(DB_NAME)_test $(SQITCH) --chdir mocks_schema deploy
+	@SQITCH_TARGET="db:pg:" PGHOST=localhost PGDATABASE=$(DB_NAME)_test $(SQITCH) --chdir db deploy
 
 .PHONY: revert_test_db_migrations
 revert_test_db_migrations: ## revert the test database migrations with sqitch
 revert_test_db_migrations: start_pg
 revert_test_db_migrations:
-	@SQITCH_TARGET="db:pg:" PGHOST=localhost PGDATABASE=$(DB_NAME)_test $(SQITCH) --chdir schema revert
-	@SQITCH_TARGET="db:pg:" PGHOST=localhost PGDATABASE=$(DB_NAME)_test $(SQITCH) --chdir mocks_schema revert
-
-.PHONY: verify_test_db_migrations
-verify_test_db_migrations: ## verify the test database migrations with sqitch
-verify_test_db_migrations: start_pg
-verify_test_db_migrations:
-	@SQITCH_TARGET="db:pg:" PGHOST=localhost PGDATABASE=$(DB_NAME)_test $(SQITCH) --chdir schema verify
-	@SQITCH_TARGET="db:pg:" PGHOST=localhost PGDATABASE=$(DB_NAME)_test $(SQITCH) --chdir mocks_schema verify
+	@SQITCH_TARGET="db:pg:" PGHOST=localhost PGDATABASE=$(DB_NAME)_test $(SQITCH) --chdir db revert
 
 .PHONY: db_unit_tests
 db_unit_tests: ## run the database unit tests
-db_unit_tests: | start_pg drop_test_db create_test_db drop_foreign_test_db create_foreign_test_db deploy_test_db_migrations
+db_unit_tests: | start_pg drop_test_db create_test_db deploy_test_db_migrations
 db_unit_tests:
-	@$(PG_PROVE) --failures -d $(DB_NAME)_test schema/test/unit/**/*_test.sql
-	@$(PG_PROVE) --failures -d $(DB_NAME)_test mocks_schema/test/**/*_test.sql
+	@$(PG_PROVE) --failures -d $(DB_NAME)_test db/test/unit/**/*_test.sql
 
 .PHONY: db_style_tests
 db_style_tests: ## run the database style tests
 db_style_tests: | start_pg deploy_test_db_migrations
 db_style_tests:
-	@$(PG_PROVE) --failures -d $(DB_NAME)_test schema/test/style/*_test.sql --set schemas_to_test=dem,dem_private
+	@$(PG_PROVE) --failures -d $(DB_NAME)_test db/test/style/*_test.sql --set schemas_to_test=dem,dem_private
