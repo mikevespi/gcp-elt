@@ -2,7 +2,7 @@
 
 begin;
 
-drop function dem_private.verify_function_not_present;
+drop function if exists dem_private.verify_function_not_present;
 
 create or replace function dem_private.verify_function_not_present(function_schema_name text, function_name text, number_of_parameters int)
 returns boolean
